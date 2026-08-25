@@ -1,0 +1,55 @@
+name: Integração contínua
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Qualidade
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v6.1.0
+
+      - name: Configurar o Go
+        uses: actions/setup-go@v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verificar dependências
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+
+      - name: Verificar formatação
+        run: |
+          files="$(gofmt -l .)"
+
+          if [ -n "$files" ]; then
+            echo "Os seguintes arquivos não estão formatados:"
+            echo "$files"
+            exit 1
+          fi
+
+      - name: Executar análise estática
+        run: go vet ./...
+
+      - name: Executar testes com detector de concorrência
+        run: go test -race ./...
+
+      - name: Compilar o executável
+        run: go build -o /tmp/cnpj-loader ./cmd/cnpj-loader
+
+      - name: Validar o executável
+        run: /tmp/cnpj-loader version
