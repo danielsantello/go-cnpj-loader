@@ -12,6 +12,12 @@ Documentos que descrevem a responsabilidade do programa, seus componentes, seus 
 
 - [Visão geral](arquitetura/visao-geral.md)
 
+### Desenvolvimento
+
+Orientações para preparar o ambiente, executar verificações de qualidade e trabalhar no código do projeto.
+
+- [Testes](desenvolvimento/testes.md)
+
 ### Decisões arquiteturais
 
 Registros de Decisão Arquitetural, também chamados de ADRs.
