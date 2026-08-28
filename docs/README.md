@@ -16,6 +16,7 @@ Documentos que descrevem a responsabilidade do programa, seus componentes, seus 
 
 Orientações para preparar o ambiente, executar verificações de qualidade e trabalhar no código do projeto.
 
+- [Compilação e execução local](desenvolvimento/compilacao.md)
 - [Testes](desenvolvimento/testes.md)
 
 ### Decisões arquiteturais

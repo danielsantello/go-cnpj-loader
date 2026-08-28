@@ -26,6 +26,7 @@ func NewRootCommand(output io.Writer, errorOutput io.Writer) *cobra.Command {
 	command.SetErr(errorOutput)
 
 	command.AddCommand(newVersionCommand(buildinfo.Current()))
+	command.AddCommand(newMigrateControlCommand(buildinfo.Current()))
 
 	return command
 }

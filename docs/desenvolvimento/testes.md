@@ -18,26 +18,103 @@ go test -race ./...
 
 Os testes unitários não exigem uma instância do MySQL.
 
-## Teste de integração com MySQL
+Os testes de integração são ignorados por padrão. Isso permite executar a suíte comum e a integração contínua sem depender de uma instância externa.
 
-O teste de integração valida uma conexão real utilizando as configurações `CNPJ_LOADER_*`.
+## Configuração dos testes de integração
 
-Por padrão, esse teste é ignorado. Isso permite executar a suíte comum e a integração contínua sem depender de uma instância externa do MySQL.
-
-Antes da execução, crie o arquivo local `.env` a partir do modelo:
+Crie o arquivo local `.env` a partir do modelo:
 
 ```bash
 cp .env.example .env
 ```
 
-Preencha no `.env` as credenciais e o endereço da instância MySQL utilizada no teste.
-
-Execute o teste de integração com:
-
-```bash
-(set -a; source .env; set +a; CNPJ_LOADER_RUN_INTEGRATION_TESTS=1 go test -v ./internal/database -run '^TestMySQLConnection$')
-```
-
-O subshell delimitado por parênteses impede que as variáveis carregadas permaneçam exportadas no terminal depois da execução.
+Preencha no `.env` as credenciais e o endereço da instância MySQL utilizada nos testes.
 
 O arquivo `.env` contém configurações locais e possíveis segredos. Ele é ignorado pelo Git e nunca deve ser versionado.
+
+Os comandos abaixo utilizam um subshell delimitado por parênteses. As variáveis carregadas deixam de existir no terminal quando a execução termina.
+
+## Teste de conexão com o MySQL
+
+Este teste:
+
+- carrega e valida a configuração;
+- abre o pool de conexões;
+- executa um ping real;
+- fecha o pool ao terminar.
+
+Execute:
+
+```bash
+(
+  set -a
+  source .env
+  set +a
+
+  CNPJ_LOADER_RUN_INTEGRATION_TESTS=1 \
+    go test -v \
+      ./internal/database \
+      -run '^TestMySQLConnection$'
+)
+```
+
+A credencial precisa apenas conseguir conectar-se à instância para realizar esse teste.
+
+## Teste do bootstrap do schema de controle
+
+Este teste percorre o fluxo completo:
+
+1. carrega e valida a configuração;
+2. conecta-se ao MySQL;
+3. carrega a migration incorporada ao executável de teste;
+4. cria um schema temporário;
+5. executa o bootstrap;
+6. verifica a tabela de migrations;
+7. verifica versão, nome, status, checksum e metadata;
+8. remove o schema temporário com `t.Cleanup`.
+
+Execute:
+
+```bash
+(
+  set -a
+  source .env
+  set +a
+
+  CNPJ_LOADER_RUN_INTEGRATION_TESTS=1 \
+    go test -v \
+      ./internal/control/migrations \
+      -run '^TestBootstrapCreatesControlSchema$'
+)
+```
+
+A credencial usada nesse teste precisa possuir privilégios para criar e excluir o schema temporário:
+
+```text
+cnpj_loader_migrations_integration_test
+```
+
+Utilize somente uma instância isolada de desenvolvimento. Não use credenciais operacionais de produção para executar testes de integração.
+
+Antes de começar, o teste confirma que o schema temporário não existe. Se encontrar um schema com esse nome, ele interrompe sem excluí-lo automaticamente, permitindo investigação.
+
+Depois que o teste começa a criar sua estrutura, registra uma função com `t.Cleanup`. Essa função tenta remover exclusivamente o schema temporário mesmo quando uma verificação termina com `t.Fatal`.
+
+Uma interrupção abrupta do processo ou da máquina pode impedir o cleanup. Nesse caso, inspecione o schema preservado antes de removê-lo manualmente.
+
+## Execução dos dois testes de integração
+
+Quando a credencial possuir todos os privilégios necessários aos dois cenários:
+
+```bash
+(
+  set -a
+  source .env
+  set +a
+
+  CNPJ_LOADER_RUN_INTEGRATION_TESTS=1 \
+    go test -v \
+      ./internal/database \
+      ./internal/control/migrations
+)
+```
