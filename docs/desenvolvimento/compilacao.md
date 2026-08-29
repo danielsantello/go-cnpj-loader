@@ -117,15 +117,30 @@ Os parênteses criam um subshell. As variáveis exportadas deixam de existir qua
 
 O arquivo `.env` contém configurações locais e possíveis segredos. Ele é ignorado pelo Git e nunca deve ser versionado.
 
-## Bootstrap do schema de controle
+## Criação e atualização do schema de controle
 
-No estágio atual do desenvolvimento, o comando:
+O comando:
 
 ```bash
 bin/cnpj-loader migrate-control
 ```
 
-cria um novo schema de controle, executa a primeira migration incorporada e registra sua aplicação.
+carrega o catálogo de migrations incorporado ao executável e verifica o estado do schema configurado.
+
+Quando o schema ainda não existe, o comando:
+
+1. cria o schema de controle;
+2. executa todas as migrations incorporadas em ordem;
+3. registra cada aplicação no histórico.
+
+Quando o schema já existe, o comando:
+
+1. consulta `control_schema_migrations`;
+2. valida versão, nome, checksum e status das migrations registradas;
+3. executa somente as migrations pendentes;
+4. preserva a metadata das migrations aplicadas anteriormente.
+
+Quando não existem migrations pendentes, o comando apenas valida o histórico e termina com sucesso.
 
 Saída esperada:
 
@@ -133,7 +148,9 @@ Saída esperada:
 Schema de controle "cnpj_loader_control" atualizado com sucesso.
 ```
 
-O comando retorna erro se o schema informado já existir. A aplicação de migrations pendentes em um schema existente será implementada na próxima evolução do mecanismo.
+A execução é interrompida quando o histórico está inconsistente, contém uma migration desconhecida, possui checksum ou nome divergente, ou apresenta status diferente de `applied`.
+
+A primeira migration cria a própria tabela de histórico e, por isso, só pode ser registrada depois de sua execução. A partir da segunda migration, cada aplicação é registrada inicialmente como `applying` e termina como `applied` ou `failed`.
 
 ## Teste manual isolado
 
@@ -162,7 +179,8 @@ SELECT
     loader_commit,
     started_at_utc,
     finished_at_utc
-FROM cnpj_loader_manual_test.control_schema_migrations;
+FROM cnpj_loader_manual_test.control_schema_migrations
+ORDER BY version;
 ```
 
 Quando a inspeção terminar, exclua exclusivamente o schema criado para esse teste:

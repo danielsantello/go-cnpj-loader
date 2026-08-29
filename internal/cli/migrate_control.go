@@ -88,7 +88,7 @@ func migrateControl(
 		return "", err
 	}
 
-	if err := migrations.Bootstrap(
+	if err := migrations.Migrate(
 		ctx,
 		connection,
 		value.ControlSchema,

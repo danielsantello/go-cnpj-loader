@@ -12,39 +12,63 @@ func TestLoadCatalogReturnsEmbeddedMigrations(t *testing.T) {
 		t.Fatalf("não foi possível carregar o catálogo: %v", err)
 	}
 
-	if len(result) != 1 {
+	expectedMigrations := []struct {
+		version uint32
+		name    string
+	}{
+		{
+			version: 1,
+			name:    "create_control_schema_migrations",
+		},
+		{
+			version: 2,
+			name:    "create_publications",
+		},
+	}
+
+	if len(result) != len(expectedMigrations) {
 		t.Fatalf(
-			"catálogo deveria possuir %d migration, mas recebeu %d",
-			1,
+			"catálogo deveria possuir %d migrations, mas recebeu %d",
+			len(expectedMigrations),
 			len(result),
 		)
 	}
 
-	migration := result[0]
+	for index, expected := range expectedMigrations {
+		migration := result[index]
 
-	if migration.Version != 1 {
-		t.Errorf(
-			"versão deveria ser %d, mas recebeu %d",
-			1,
-			migration.Version,
-		)
-	}
+		if migration.Version != expected.version {
+			t.Errorf(
+				"migration %d deveria possuir versão %d, mas recebeu %d",
+				index,
+				expected.version,
+				migration.Version,
+			)
+		}
 
-	if migration.Name != "create_control_schema_migrations" {
-		t.Errorf(
-			"nome deveria ser %q, mas recebeu %q",
-			"create_control_schema_migrations",
-			migration.Name,
-		)
-	}
+		if migration.Name != expected.name {
+			t.Errorf(
+				"migration %d deveria possuir nome %q, mas recebeu %q",
+				index,
+				expected.name,
+				migration.Name,
+			)
+		}
 
-	if strings.TrimSpace(migration.SQL) == "" {
-		t.Error("conteúdo SQL da migration não deveria estar vazio")
-	}
+		if strings.TrimSpace(migration.SQL) == "" {
+			t.Errorf(
+				"conteúdo SQL da migration %d não deveria estar vazio",
+				index,
+			)
+		}
 
-	expectedChecksum := sha256.Sum256([]byte(migration.SQL))
-	if migration.Checksum != expectedChecksum {
-		t.Error("checksum deveria corresponder ao conteúdo SQL")
+		expectedChecksum := sha256.Sum256([]byte(migration.SQL))
+		if migration.Checksum != expectedChecksum {
+			t.Errorf(
+				"checksum da migration %d deveria corresponder ao conteúdo SQL",
+				index,
+			)
+		}
 	}
 }
 

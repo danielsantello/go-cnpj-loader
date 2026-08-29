@@ -60,18 +60,21 @@ Execute:
 
 A credencial precisa apenas conseguir conectar-se à instância para realizar esse teste.
 
-## Teste do bootstrap do schema de controle
+## Teste das migrations do schema de controle
 
 Este teste percorre o fluxo completo:
 
 1. carrega e valida a configuração;
 2. conecta-se ao MySQL;
-3. carrega a migration incorporada ao executável de teste;
+3. carrega o catálogo de migrations incorporado ao executável de teste;
 4. cria um schema temporário;
-5. executa o bootstrap;
-6. verifica a tabela de migrations;
-7. verifica versão, nome, status, checksum e metadata;
-8. remove o schema temporário com `t.Cleanup`.
+5. executa todas as migrations disponíveis;
+6. executa novamente o mecanismo para validar sua idempotência;
+7. verifica as tabelas `control_schema_migrations` e `publications`;
+8. compara todos os registros do histórico com o catálogo incorporado;
+9. provoca uma falha controlada de DDL;
+10. verifica o status `failed`, o código MySQL, o SQL state, a mensagem e o horário da falha;
+11. remove o schema temporário com `t.Cleanup`.
 
 Execute:
 
@@ -88,7 +91,9 @@ Execute:
 )
 ```
 
-A credencial usada nesse teste precisa possuir privilégios para criar e excluir o schema temporário:
+A falha controlada faz parte do teste e é capturada pelo próprio código. Quando todas as verificações passam, o resultado final do teste continua sendo `PASS`.
+
+A credencial usada nesse teste precisa possuir privilégios para criar, alterar e excluir objetos no schema temporário:
 
 ```text
 cnpj_loader_migrations_integration_test
