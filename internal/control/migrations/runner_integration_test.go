@@ -243,6 +243,29 @@ func TestBootstrapCreatesControlSchema(t *testing.T) {
 		t.Fatal("tabela de execuções deveria existir")
 	}
 
+	err = connection.QueryRowContext(
+		ctx,
+		`
+			SELECT EXISTS (
+				SELECT 1
+				FROM information_schema.TABLES
+				WHERE TABLE_SCHEMA = ?
+					AND TABLE_NAME = 'execution_configurations'
+			)
+		`,
+		integrationTestSchema,
+	).Scan(&tableExists)
+	if err != nil {
+		t.Fatalf(
+			"não foi possível verificar a tabela de configurações das execuções: %v",
+			err,
+		)
+	}
+
+	if !tableExists {
+		t.Fatal("tabela de configurações das execuções deveria existir")
+	}
+
 	catalog, err := LoadCatalog()
 	if err != nil {
 		t.Fatalf("não foi possível carregar o catálogo: %v", err)
