@@ -28,6 +28,10 @@ func TestLoadCatalogReturnsEmbeddedMigrations(t *testing.T) {
 			version: 3,
 			name:    "create_publication_files",
 		},
+		{
+			version: 4,
+			name:    "create_versions",
+		},
 	}
 
 	if len(result) != len(expectedMigrations) {

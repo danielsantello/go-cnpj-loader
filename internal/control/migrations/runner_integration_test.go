@@ -197,6 +197,29 @@ func TestBootstrapCreatesControlSchema(t *testing.T) {
 		t.Fatal("tabela de arquivos da publicação deveria existir")
 	}
 
+	err = connection.QueryRowContext(
+		ctx,
+		`
+			SELECT EXISTS (
+				SELECT 1
+				FROM information_schema.TABLES
+				WHERE TABLE_SCHEMA = ?
+					AND TABLE_NAME = 'versions'
+			)
+		`,
+		integrationTestSchema,
+	).Scan(&tableExists)
+	if err != nil {
+		t.Fatalf(
+			"não foi possível verificar a tabela de versões: %v",
+			err,
+		)
+	}
+
+	if !tableExists {
+		t.Fatal("tabela de versões deveria existir")
+	}
+
 	catalog, err := LoadCatalog()
 	if err != nil {
 		t.Fatalf("não foi possível carregar o catálogo: %v", err)
