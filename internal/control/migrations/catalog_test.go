@@ -40,6 +40,10 @@ func TestLoadCatalogReturnsEmbeddedMigrations(t *testing.T) {
 			version: 6,
 			name:    "create_execution_configurations",
 		},
+		{
+			version: 7,
+			name:    "create_execution_steps",
+		},
 	}
 
 	if len(result) != len(expectedMigrations) {
