@@ -15,6 +15,12 @@ CREATE TABLE publication_files (
     CONSTRAINT pk_publication_files
         PRIMARY KEY (id),
 
+    CONSTRAINT uq_publication_files_id_publication
+        UNIQUE (
+            id,
+            publication_id
+        ),
+
     CONSTRAINT uq_publication_files_dataset_part
         UNIQUE (
             publication_id,

@@ -289,6 +289,29 @@ func TestBootstrapCreatesControlSchema(t *testing.T) {
 		t.Fatal("tabela de etapas das execuções deveria existir")
 	}
 
+	err = connection.QueryRowContext(
+		ctx,
+		`
+			SELECT EXISTS (
+				SELECT 1
+				FROM information_schema.TABLES
+				WHERE TABLE_SCHEMA = ?
+					AND TABLE_NAME = 'file_loads'
+			)
+		`,
+		integrationTestSchema,
+	).Scan(&tableExists)
+	if err != nil {
+		t.Fatalf(
+			"não foi possível verificar a tabela de cargas dos arquivos: %v",
+			err,
+		)
+	}
+
+	if !tableExists {
+		t.Fatal("tabela de cargas dos arquivos deveria existir")
+	}
+
 	catalog, err := LoadCatalog()
 	if err != nil {
 		t.Fatalf("não foi possível carregar o catálogo: %v", err)

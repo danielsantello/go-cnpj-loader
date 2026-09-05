@@ -13,6 +13,12 @@ CREATE TABLE execution_steps (
     CONSTRAINT pk_execution_steps
         PRIMARY KEY (id),
 
+    CONSTRAINT uq_execution_steps_id_execution
+        UNIQUE (
+            id,
+            execution_id
+        ),
+
     CONSTRAINT uq_execution_steps_sequence
         UNIQUE (
             execution_id,

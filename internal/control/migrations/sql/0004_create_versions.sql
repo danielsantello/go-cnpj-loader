@@ -14,6 +14,12 @@ CREATE TABLE versions (
     CONSTRAINT pk_versions
         PRIMARY KEY (id),
 
+    CONSTRAINT uq_versions_id_publication
+        UNIQUE (
+            id,
+            publication_id
+        ),
+
     CONSTRAINT uq_versions_schema_name
         UNIQUE (schema_name),
 

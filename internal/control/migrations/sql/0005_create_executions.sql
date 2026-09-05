@@ -16,6 +16,12 @@ CREATE TABLE executions (
     CONSTRAINT pk_executions
         PRIMARY KEY (id),
 
+    CONSTRAINT uq_executions_id_version
+        UNIQUE (
+            id,
+            version_id
+        ),
+
     INDEX idx_executions_version_id (version_id),
 
     INDEX idx_executions_status_started_at (
