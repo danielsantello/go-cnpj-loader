@@ -1,0 +1,85 @@
+{
+  "format_version": 1,
+  "datasets": [
+    {
+      "code": "economic_activities",
+      "file_pattern": "^Cnaes\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "companies",
+      "file_pattern": "^Empresas([0-9]+)\\.zip$",
+      "part_number": {
+        "source": "capture_group",
+        "capture_group": 1
+      }
+    },
+    {
+      "code": "establishments",
+      "file_pattern": "^Estabelecimentos([0-9]+)\\.zip$",
+      "part_number": {
+        "source": "capture_group",
+        "capture_group": 1
+      }
+    },
+    {
+      "code": "registration_status_reasons",
+      "file_pattern": "^Motivos\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "municipalities",
+      "file_pattern": "^Municipios\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "legal_natures",
+      "file_pattern": "^Naturezas\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "countries",
+      "file_pattern": "^Paises\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "partner_qualifications",
+      "file_pattern": "^Qualificacoes\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "simple_tax_options",
+      "file_pattern": "^Simples\\.zip$",
+      "part_number": {
+        "source": "fixed",
+        "value": 0
+      }
+    },
+    {
+      "code": "partners",
+      "file_pattern": "^Socios([0-9]+)\\.zip$",
+      "part_number": {
+        "source": "capture_group",
+        "capture_group": 1
+      }
+    }
+  ]
+}
