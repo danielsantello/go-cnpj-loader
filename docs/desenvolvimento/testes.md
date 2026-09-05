@@ -70,7 +70,7 @@ Este teste percorre o fluxo completo:
 4. cria um schema temporário;
 5. executa todas as migrations disponíveis;
 6. executa novamente o mecanismo para validar sua idempotência;
-7. verifica as tabelas `control_schema_migrations`, `publications`, `publication_files`, `versions`, `executions`, `execution_configurations`, `execution_steps` e `file_loads`;
+7. verifica as tabelas `control_schema_migrations`, `publications`, `publication_files`, `versions`, `executions`, `execution_configurations`, `execution_steps`, `file_loads` e `execution_events`;
 8. compara todos os registros do histórico com o catálogo incorporado;
 9. provoca uma falha controlada de DDL;
 10. verifica o status `failed`, o código MySQL, o SQL state, a mensagem e o horário da falha;
