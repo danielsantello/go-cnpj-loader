@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -75,6 +76,30 @@ func Validate(value Config) error {
 				"%s deve ser um identificador MySQL válido em letras minúsculas",
 				EnvControlSchema,
 			),
+		)
+	}
+
+	return errors.Join(problems...)
+}
+
+func ValidateLoad(value Config) error {
+	var problems []error
+
+	if err := Validate(value); err != nil {
+		problems = append(problems, err)
+	}
+
+	workspacePath := strings.TrimSpace(value.WorkspacePath)
+
+	if workspacePath == "" {
+		problems = append(
+			problems,
+			fmt.Errorf("%s é obrigatória", EnvWorkspace),
+		)
+	} else if !filepath.IsAbs(value.WorkspacePath) {
+		problems = append(
+			problems,
+			fmt.Errorf("%s deve conter um caminho absoluto", EnvWorkspace),
 		)
 	}
 

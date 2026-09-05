@@ -15,6 +15,7 @@ const (
 	EnvMySQLPassword       = "CNPJ_LOADER_MYSQL_PASSWORD"
 	EnvMySQLConnectTimeout = "CNPJ_LOADER_MYSQL_CONNECT_TIMEOUT"
 	EnvControlSchema       = "CNPJ_LOADER_CONTROL_SCHEMA"
+	EnvWorkspace           = "CNPJ_LOADER_WORKSPACE"
 )
 
 func Load() (Config, error) {
@@ -64,6 +65,10 @@ func Load() (Config, error) {
 
 	if value, exists := os.LookupEnv(EnvControlSchema); exists {
 		result.ControlSchema = value
+	}
+
+	if value, exists := os.LookupEnv(EnvWorkspace); exists {
+		result.WorkspacePath = value
 	}
 
 	return result, nil

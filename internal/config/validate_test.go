@@ -128,3 +128,57 @@ func TestValidateControlSchemaName(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateLoadAcceptsAbsoluteWorkspacePath(t *testing.T) {
+	value := Default()
+	value.MySQL.User = "cnpj_loader"
+	value.MySQL.Password = "secret"
+	value.WorkspacePath = "/dados/cnpj-loader"
+
+	err := ValidateLoad(value)
+	if err != nil {
+		t.Fatalf("não esperava erro, mas recebeu: %v", err)
+	}
+}
+
+func TestValidateLoadRejectsInvalidWorkspacePath(t *testing.T) {
+	tests := []struct {
+		name          string
+		workspacePath string
+	}{
+		{
+			name:          "caminho vazio",
+			workspacePath: "",
+		},
+		{
+			name:          "caminho relativo",
+			workspacePath: "workspace",
+		},
+		{
+			name:          "caminho absoluto com espaço inicial",
+			workspacePath: " /dados/cnpj-loader",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			value := Default()
+			value.MySQL.User = "cnpj_loader"
+			value.MySQL.Password = "secret"
+			value.WorkspacePath = test.workspacePath
+
+			err := ValidateLoad(value)
+			if err == nil {
+				t.Fatal("esperava erro, mas recebeu nil")
+			}
+
+			if !strings.Contains(err.Error(), EnvWorkspace) {
+				t.Errorf(
+					"erro deveria mencionar %q, mas recebeu: %v",
+					EnvWorkspace,
+					err,
+				)
+			}
+		})
+	}
+}

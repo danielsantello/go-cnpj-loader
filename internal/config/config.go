@@ -21,6 +21,7 @@ type Config struct {
 	Environment   Environment
 	MySQL         MySQL
 	ControlSchema string
+	WorkspacePath string
 }
 
 type MySQL struct {

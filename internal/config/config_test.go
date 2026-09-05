@@ -48,6 +48,13 @@ func TestDefault(t *testing.T) {
 		)
 	}
 
+	if result.WorkspacePath != "" {
+		t.Errorf(
+			"workspace não deveria possuir valor padrão, mas recebeu %q",
+			result.WorkspacePath,
+		)
+	}
+
 	if result.MySQL.User != "" {
 		t.Errorf("usuário do MySQL não deveria possuir valor padrão")
 	}
