@@ -58,6 +58,12 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 						file.SourceName,
 					)
 				},
+				func(message string) {
+					fmt.Fprintln(
+						command.OutOrStdout(),
+						message,
+					)
+				},
 			)
 			if err != nil {
 				return err
@@ -114,6 +120,12 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 				result.data.partnerQualificationCount,
 			)
 
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Empresas carregadas: %d.\n",
+				result.data.companyCount,
+			)
+
 			return nil
 		},
 	}
@@ -149,6 +161,7 @@ func loadDirectoryPublication(
 	referenceYear uint16,
 	referenceMonth uint8,
 	progress publication.VerifyFileProgress,
+	report func(string),
 ) (loadResult, error) {
 	if referenceYear < 1000 || referenceYear > 9999 {
 		return loadResult{}, fmt.Errorf(
@@ -270,6 +283,7 @@ func loadDirectoryPublication(
 		referenceYear,
 		referenceMonth,
 		files,
+		report,
 	)
 	if err != nil {
 		return loadResult{}, fmt.Errorf(

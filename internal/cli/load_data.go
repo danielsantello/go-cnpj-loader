@@ -37,6 +37,7 @@ type dataLoadResult struct {
 	legalNatureCount              uint64
 	countryCount                  uint64
 	partnerQualificationCount     uint64
+	companyCount                  uint64
 }
 
 func createVersionAndLoadData(
@@ -47,6 +48,7 @@ func createVersionAndLoadData(
 	referenceYear uint16,
 	referenceMonth uint8,
 	files []publication.VerifiedFile,
+	report func(string),
 ) (control.Version, dataLoadResult, error) {
 	version, err := control.CreatePendingVersion(
 		ctx,
@@ -146,6 +148,17 @@ func createVersionAndLoadData(
 		rowCounts[definition.datasetCode] = rowCount
 	}
 
+	companyCount, err := loadCompanies(
+		ctx,
+		connection,
+		version.SchemaName,
+		files,
+		report,
+	)
+	if err != nil {
+		return control.Version{}, dataLoadResult{}, err
+	}
+
 	return version, dataLoadResult{
 		economicActivityCount:         rowCounts["economic_activities"],
 		registrationStatusReasonCount: rowCounts["registration_status_reasons"],
@@ -153,6 +166,7 @@ func createVersionAndLoadData(
 		legalNatureCount:              rowCounts["legal_natures"],
 		countryCount:                  rowCounts["countries"],
 		partnerQualificationCount:     rowCounts["partner_qualifications"],
+		companyCount:                  companyCount,
 	}, nil
 }
 

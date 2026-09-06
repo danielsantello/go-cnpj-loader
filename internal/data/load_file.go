@@ -96,6 +96,7 @@ func loadZIPFile(
 			FIELDS
 				TERMINATED BY ';'
 				ENCLOSED BY '"'
+				ESCAPED BY ''
 			LINES TERMINATED BY '\n'
 			(
 				%s
