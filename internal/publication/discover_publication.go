@@ -6,6 +6,18 @@ func DiscoverDirectoryPublication(
 	catalog Catalog,
 	source Source,
 ) ([]VerifiedFile, error) {
+	return DiscoverDirectoryPublicationWithProgress(
+		catalog,
+		source,
+		nil,
+	)
+}
+
+func DiscoverDirectoryPublicationWithProgress(
+	catalog Catalog,
+	source Source,
+	progress VerifyFileProgress,
+) ([]VerifiedFile, error) {
 	discoveredFiles, err := DiscoverDirectory(source)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -35,7 +47,10 @@ func DiscoverDirectoryPublication(
 		)
 	}
 
-	verifiedFiles, err := VerifyFiles(classifiedFiles)
+	verifiedFiles, err := VerifyFilesWithProgress(
+		classifiedFiles,
+		progress,
+	)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"não foi possível verificar a publicação descoberta: %w",

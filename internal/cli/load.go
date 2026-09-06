@@ -15,8 +15,11 @@ import (
 
 type loadResult struct {
 	publicationID uint64
+	versionID     uint64
 	fileCount     int
+	countryCount  uint64
 	controlSchema string
+	dataSchema    string
 }
 
 func newLoadCommand(info buildinfo.Info) *cobra.Command {
@@ -42,7 +45,21 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 				sourceValue,
 				referenceYear,
 				referenceMonth,
+				func(
+					current int,
+					total int,
+					file publication.ClassifiedFile,
+				) {
+					fmt.Fprintf(
+						command.OutOrStdout(),
+						"Verificando arquivo %d/%d: %s\n",
+						current,
+						total,
+						file.SourceName,
+					)
+				},
 			)
+
 			if err != nil {
 				return err
 			}
@@ -53,6 +70,14 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 				result.publicationID,
 				result.fileCount,
 				result.controlSchema,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Versão %d criada no schema %q com %d países carregados.\n",
+				result.versionID,
+				result.dataSchema,
+				result.countryCount,
 			)
 
 			return nil
@@ -89,6 +114,7 @@ func loadDirectoryPublication(
 	sourceValue string,
 	referenceYear uint16,
 	referenceMonth uint8,
+	progress publication.VerifyFileProgress,
 ) (loadResult, error) {
 	if referenceYear < 1000 || referenceYear > 9999 {
 		return loadResult{}, fmt.Errorf(
@@ -141,9 +167,10 @@ func loadDirectoryPublication(
 		)
 	}
 
-	files, err := publication.DiscoverDirectoryPublication(
+	files, err := publication.DiscoverDirectoryPublicationWithProgress(
 		catalog,
 		source,
+		progress,
 	)
 	if err != nil {
 		return loadResult{}, err
@@ -201,9 +228,28 @@ func loadDirectoryPublication(
 		)
 	}
 
+	version, countryCount, err := createVersionAndLoadCountries(
+		ctx,
+		connection,
+		value,
+		publicationID,
+		referenceYear,
+		referenceMonth,
+		files,
+	)
+	if err != nil {
+		return loadResult{}, fmt.Errorf(
+			"não foi possível iniciar a carga da versão: %w",
+			err,
+		)
+	}
+
 	return loadResult{
 		publicationID: publicationID,
+		versionID:     version.ID,
 		fileCount:     len(files),
+		countryCount:  countryCount,
 		controlSchema: value.ControlSchema,
+		dataSchema:    version.SchemaName,
 	}, nil
 }
