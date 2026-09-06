@@ -7,7 +7,7 @@ import (
 	"github.com/danielsantello/go-cnpj-loader/internal/publication"
 )
 
-func LoadCountries(
+func LoadPartnerQualifications(
 	ctx context.Context,
 	connection *sql.DB,
 	schemaName string,
@@ -17,7 +17,7 @@ func LoadCountries(
 		ctx,
 		connection,
 		schemaName,
-		"countries",
+		"partner_qualifications",
 		[]string{
 			"code",
 			"name",

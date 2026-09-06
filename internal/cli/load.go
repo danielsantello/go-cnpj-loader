@@ -17,9 +17,9 @@ type loadResult struct {
 	publicationID uint64
 	versionID     uint64
 	fileCount     int
-	countryCount  uint64
 	controlSchema string
 	dataSchema    string
+	data          dataLoadResult
 }
 
 func newLoadCommand(info buildinfo.Info) *cobra.Command {
@@ -59,7 +59,6 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 					)
 				},
 			)
-
 			if err != nil {
 				return err
 			}
@@ -74,10 +73,45 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 
 			fmt.Fprintf(
 				command.OutOrStdout(),
-				"Versão %d criada no schema %q com %d países carregados.\n",
+				"Versão %d criada no schema %q.\n",
 				result.versionID,
 				result.dataSchema,
-				result.countryCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Atividades econômicas carregadas: %d.\n",
+				result.data.economicActivityCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Motivos da situação cadastral carregados: %d.\n",
+				result.data.registrationStatusReasonCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Municípios carregados: %d.\n",
+				result.data.municipalityCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Naturezas jurídicas carregadas: %d.\n",
+				result.data.legalNatureCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Países carregados: %d.\n",
+				result.data.countryCount,
+			)
+
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Qualificações dos sócios carregadas: %d.\n",
+				result.data.partnerQualificationCount,
 			)
 
 			return nil
@@ -228,7 +262,7 @@ func loadDirectoryPublication(
 		)
 	}
 
-	version, countryCount, err := createVersionAndLoadCountries(
+	version, dataResult, err := createVersionAndLoadData(
 		ctx,
 		connection,
 		value,
@@ -248,7 +282,7 @@ func loadDirectoryPublication(
 		publicationID: publicationID,
 		versionID:     version.ID,
 		fileCount:     len(files),
-		countryCount:  countryCount,
+		data:          dataResult,
 		controlSchema: value.ControlSchema,
 		dataSchema:    version.SchemaName,
 	}, nil
