@@ -1,6 +1,7 @@
 package publication
 
 import (
+	"crypto/sha256"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 func TestDiscoverDirectoryPublicationReturnsValidatedFiles(t *testing.T) {
 	directory := t.TempDir()
+	content := []byte("conteúdo de teste")
 
 	fileNames := []string{
 		"Paises.zip",
@@ -21,7 +23,7 @@ func TestDiscoverDirectoryPublicationReturnsValidatedFiles(t *testing.T) {
 
 		if err := os.WriteFile(
 			filePath,
-			[]byte("conteúdo de teste"),
+			content,
 			0o600,
 		); err != nil {
 			t.Fatalf(
@@ -67,24 +69,38 @@ func TestDiscoverDirectoryPublicationReturnsValidatedFiles(t *testing.T) {
 		t.Fatalf("não esperava erro, mas recebeu: %v", err)
 	}
 
-	expected := []ClassifiedFile{
+	digest := sha256.Sum256(content)
+
+	expected := []VerifiedFile{
 		{
-			DatasetCode:    "companies",
-			PartNumber:     0,
-			SourceName:     "Empresas0.zip",
-			SourceLocation: filepath.Join(directory, "Empresas0.zip"),
+			ClassifiedFile: ClassifiedFile{
+				DatasetCode:    "companies",
+				PartNumber:     0,
+				SourceName:     "Empresas0.zip",
+				SourceLocation: filepath.Join(directory, "Empresas0.zip"),
+			},
+			SizeBytes: uint64(len(content)),
+			SHA256:    digest,
 		},
 		{
-			DatasetCode:    "companies",
-			PartNumber:     1,
-			SourceName:     "Empresas1.zip",
-			SourceLocation: filepath.Join(directory, "Empresas1.zip"),
+			ClassifiedFile: ClassifiedFile{
+				DatasetCode:    "companies",
+				PartNumber:     1,
+				SourceName:     "Empresas1.zip",
+				SourceLocation: filepath.Join(directory, "Empresas1.zip"),
+			},
+			SizeBytes: uint64(len(content)),
+			SHA256:    digest,
 		},
 		{
-			DatasetCode:    "countries",
-			PartNumber:     0,
-			SourceName:     "Paises.zip",
-			SourceLocation: filepath.Join(directory, "Paises.zip"),
+			ClassifiedFile: ClassifiedFile{
+				DatasetCode:    "countries",
+				PartNumber:     0,
+				SourceName:     "Paises.zip",
+				SourceLocation: filepath.Join(directory, "Paises.zip"),
+			},
+			SizeBytes: uint64(len(content)),
+			SHA256:    digest,
 		},
 	}
 

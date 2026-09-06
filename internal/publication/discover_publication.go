@@ -5,7 +5,7 @@ import "fmt"
 func DiscoverDirectoryPublication(
 	catalog Catalog,
 	source Source,
-) ([]ClassifiedFile, error) {
+) ([]VerifiedFile, error) {
 	discoveredFiles, err := DiscoverDirectory(source)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -35,5 +35,13 @@ func DiscoverDirectoryPublication(
 		)
 	}
 
-	return classifiedFiles, nil
+	verifiedFiles, err := VerifyFiles(classifiedFiles)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"não foi possível verificar a publicação descoberta: %w",
+			err,
+		)
+	}
+
+	return verifiedFiles, nil
 }

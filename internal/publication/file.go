@@ -11,3 +11,9 @@ type ClassifiedFile struct {
 	SourceName     string
 	SourceLocation string
 }
+
+type VerifiedFile struct {
+	ClassifiedFile ClassifiedFile
+	SizeBytes      uint64
+	SHA256         [32]byte
+}
