@@ -1,9 +1,10 @@
 package cli
 
 import (
+	"io"
+
 	"github.com/danielsantello/go-cnpj-loader/internal/buildinfo"
 	"github.com/spf13/cobra"
-	"io"
 )
 
 func NewRootCommand(output io.Writer, errorOutput io.Writer) *cobra.Command {
@@ -27,6 +28,7 @@ func NewRootCommand(output io.Writer, errorOutput io.Writer) *cobra.Command {
 
 	command.AddCommand(newVersionCommand(buildinfo.Current()))
 	command.AddCommand(newMigrateControlCommand(buildinfo.Current()))
+	command.AddCommand(newLoadCommand(buildinfo.Current()))
 
 	return command
 }
