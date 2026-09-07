@@ -132,6 +132,12 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 				result.data.establishmentCount,
 			)
 
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Sócios carregados: %d.\n",
+				result.data.partnerCount,
+			)
+
 			return nil
 		},
 	}

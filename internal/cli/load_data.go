@@ -39,6 +39,7 @@ type dataLoadResult struct {
 	partnerQualificationCount     uint64
 	companyCount                  uint64
 	establishmentCount            uint64
+	partnerCount                  uint64
 }
 
 func createVersionAndLoadData(
@@ -171,6 +172,17 @@ func createVersionAndLoadData(
 		return control.Version{}, dataLoadResult{}, err
 	}
 
+	partnerCount, err := loadPartners(
+		ctx,
+		connection,
+		version.SchemaName,
+		files,
+		report,
+	)
+	if err != nil {
+		return control.Version{}, dataLoadResult{}, err
+	}
+
 	return version, dataLoadResult{
 		economicActivityCount:         rowCounts["economic_activities"],
 		registrationStatusReasonCount: rowCounts["registration_status_reasons"],
@@ -180,6 +192,7 @@ func createVersionAndLoadData(
 		partnerQualificationCount:     rowCounts["partner_qualifications"],
 		companyCount:                  companyCount,
 		establishmentCount:            establishmentCount,
+		partnerCount:                  partnerCount,
 	}, nil
 }
 
