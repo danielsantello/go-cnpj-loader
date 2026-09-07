@@ -195,6 +195,15 @@ func createVersionAndLoadData(
 		return control.Version{}, dataLoadResult{}, err
 	}
 
+	if err := control.MarkVersionReady(
+		ctx,
+		connection,
+		value.ControlSchema,
+		version.ID,
+	); err != nil {
+		return control.Version{}, dataLoadResult{}, err
+	}
+
 	return version, dataLoadResult{
 		economicActivityCount:         rowCounts["economic_activities"],
 		registrationStatusReasonCount: rowCounts["registration_status_reasons"],

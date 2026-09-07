@@ -79,7 +79,7 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 
 			fmt.Fprintf(
 				command.OutOrStdout(),
-				"Versão %d criada no schema %q.\n",
+				"Versão %d concluída com sucesso no schema %q.\n",
 				result.versionID,
 				result.dataSchema,
 			)
