@@ -138,6 +138,12 @@ func newLoadCommand(info buildinfo.Info) *cobra.Command {
 				result.data.partnerCount,
 			)
 
+			fmt.Fprintf(
+				command.OutOrStdout(),
+				"Opções pelo Simples e MEI carregadas: %d.\n",
+				result.data.simpleTaxOptionCount,
+			)
+
 			return nil
 		},
 	}

@@ -40,6 +40,7 @@ type dataLoadResult struct {
 	companyCount                  uint64
 	establishmentCount            uint64
 	partnerCount                  uint64
+	simpleTaxOptionCount          uint64
 }
 
 func createVersionAndLoadData(
@@ -183,6 +184,17 @@ func createVersionAndLoadData(
 		return control.Version{}, dataLoadResult{}, err
 	}
 
+	simpleTaxOptionCount, err := loadSimpleTaxOptions(
+		ctx,
+		connection,
+		version.SchemaName,
+		files,
+		report,
+	)
+	if err != nil {
+		return control.Version{}, dataLoadResult{}, err
+	}
+
 	return version, dataLoadResult{
 		economicActivityCount:         rowCounts["economic_activities"],
 		registrationStatusReasonCount: rowCounts["registration_status_reasons"],
@@ -193,6 +205,7 @@ func createVersionAndLoadData(
 		companyCount:                  companyCount,
 		establishmentCount:            establishmentCount,
 		partnerCount:                  partnerCount,
+		simpleTaxOptionCount:          simpleTaxOptionCount,
 	}, nil
 }
 
