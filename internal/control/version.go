@@ -298,3 +298,71 @@ func MarkVersionReady(
 
 	return nil
 }
+
+func MarkVersionFailed(
+	ctx context.Context,
+	connection *sql.DB,
+	controlSchema string,
+	versionID uint64,
+) error {
+	if connection == nil {
+		return fmt.Errorf(
+			"conexão com o MySQL não foi informada",
+		)
+	}
+
+	if !controlSchemaNamePattern.MatchString(controlSchema) {
+		return fmt.Errorf(
+			"nome do schema de controle é inválido: %q",
+			controlSchema,
+		)
+	}
+
+	failedAt := time.Now().UTC()
+
+	statement := fmt.Sprintf(
+		`
+			UPDATE %s.versions
+			SET
+				status = 'failed',
+				failed_at_utc = ?,
+				status_changed_at_utc = ?
+			WHERE id = ?
+				AND status = 'loading'
+		`,
+		controlSchema,
+	)
+
+	result, err := connection.ExecContext(
+		ctx,
+		statement,
+		failedAt,
+		failedAt,
+		versionID,
+	)
+	if err != nil {
+		return fmt.Errorf(
+			"não foi possível registrar a falha da versão %d: %w",
+			versionID,
+			err,
+		)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf(
+			"não foi possível confirmar a falha da versão %d: %w",
+			versionID,
+			err,
+		)
+	}
+
+	if rowsAffected != 1 {
+		return fmt.Errorf(
+			"versão %d não está em carga para registrar falha",
+			versionID,
+		)
+	}
+
+	return nil
+}

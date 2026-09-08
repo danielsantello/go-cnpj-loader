@@ -3,7 +3,9 @@ package cli
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/danielsantello/go-cnpj-loader/internal/config"
 	"github.com/danielsantello/go-cnpj-loader/internal/control"
@@ -52,7 +54,11 @@ func createVersionAndLoadData(
 	referenceMonth uint8,
 	files []publication.VerifiedFile,
 	report func(string),
-) (control.Version, dataLoadResult, error) {
+) (
+	resultVersion control.Version,
+	resultData dataLoadResult,
+	resultErr error,
+) {
 	version, err := control.CreatePendingVersion(
 		ctx,
 		connection,
@@ -75,6 +81,30 @@ func createVersionAndLoadData(
 	); err != nil {
 		return control.Version{}, dataLoadResult{}, err
 	}
+
+	defer func() {
+		if resultErr == nil {
+			return
+		}
+
+		failureContext, cancel := context.WithTimeout(
+			context.WithoutCancel(ctx),
+			10*time.Second,
+		)
+		defer cancel()
+
+		if err := control.MarkVersionFailed(
+			failureContext,
+			connection,
+			value.ControlSchema,
+			version.ID,
+		); err != nil {
+			resultErr = errors.Join(
+				resultErr,
+				err,
+			)
+		}
+	}()
 
 	if err := data.CreateSchema(
 		ctx,
