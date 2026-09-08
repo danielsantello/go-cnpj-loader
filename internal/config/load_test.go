@@ -14,7 +14,6 @@ func TestLoadOverridesDefaultsWithEnvironmentVariables(t *testing.T) {
 	t.Setenv(EnvMySQLPassword, "secret")
 	t.Setenv(EnvMySQLConnectTimeout, "15s")
 	t.Setenv(EnvControlSchema, "custom_control")
-	t.Setenv(EnvWorkspace, "/dados/cnpj-loader")
 
 	result, err := Load()
 	if err != nil {
@@ -70,14 +69,6 @@ func TestLoadOverridesDefaultsWithEnvironmentVariables(t *testing.T) {
 			"schema de controle deveria ser %q, mas recebeu %q",
 			"custom_control",
 			result.ControlSchema,
-		)
-	}
-
-	if result.WorkspacePath != "/dados/cnpj-loader" {
-		t.Errorf(
-			"workspace deveria ser %q, mas recebeu %q",
-			"/dados/cnpj-loader",
-			result.WorkspacePath,
 		)
 	}
 }

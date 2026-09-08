@@ -217,7 +217,7 @@ func loadDirectoryPublication(
 		)
 	}
 
-	if err := config.ValidateLoad(value); err != nil {
+	if err := config.Validate(value); err != nil {
 		return loadResult{}, fmt.Errorf(
 			"configuração inválida: %w",
 			err,
