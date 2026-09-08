@@ -29,6 +29,7 @@ func NewRootCommand(output io.Writer, errorOutput io.Writer) *cobra.Command {
 	command.AddCommand(newVersionCommand(buildinfo.Current()))
 	command.AddCommand(newMigrateControlCommand(buildinfo.Current()))
 	command.AddCommand(newLoadCommand(buildinfo.Current()))
+	command.AddCommand(newDownloadCommand())
 
 	return command
 }
