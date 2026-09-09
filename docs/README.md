@@ -46,9 +46,9 @@ Experimentos reproduzíveis utilizados para escolher estratégias técnicas.
 
 ### Operação
 
-Procedimentos de instalação, configuração, execução, diagnóstico, exclusão de versões e limpeza do workspace.
+Orientações para configurar o ambiente e executar os comandos públicos do loader.
 
-A documentação operacional será adicionada conforme os comandos forem implementados.
+- [Guia de operação](operacao/README.md)
 
 ### Referência
 
