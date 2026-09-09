@@ -31,25 +31,19 @@ bin/cnpj-loader --help
 
 Consulte [Compilação e execução local](../desenvolvimento/compilacao.md) para gerar um binário com metadados de versão, commit e data de compilação.
 
-## Configuração do MySQL
+## Preparação do MySQL
 
-A carga requer uma instância MySQL 8.4 com `local_infile` habilitado.
+A carga requer uma instância MySQL 8.4 acessível, com `local_infile` habilitado e uma conta operacional própria.
 
-Verifique o valor atual:
+Antes da execução, confirme:
 
 ```sql
 SHOW GLOBAL VARIABLES LIKE 'local_infile';
 ```
 
-O resultado esperado é:
+O resultado precisa indicar `ON`.
 
-```text
-local_infile | ON
-```
-
-O loader utiliza `LOAD DATA LOCAL INFILE` para transmitir ao MySQL o conteúdo dos arquivos mantidos dentro dos ZIPs. Os CSVs não são extraídos fisicamente.
-
-A configuração persistente de `local_infile` e o conjunto mínimo de privilégios do usuário operacional serão documentados antes da primeira release.
+Consulte [Preparação do MySQL](mysql.md) para configuração persistente, exemplo opcional com Docker Compose e privilégios mínimos validados.
 
 ## Configuração do loader
 

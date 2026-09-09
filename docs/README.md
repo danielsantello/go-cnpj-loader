@@ -49,6 +49,7 @@ Experimentos reproduzíveis utilizados para escolher estratégias técnicas.
 Orientações para configurar o ambiente e executar os comandos públicos do loader.
 
 - [Guia de operação](operacao/README.md)
+- [Preparação do MySQL](operacao/mysql.md)
 
 ### Referência
 
