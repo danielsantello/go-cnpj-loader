@@ -7,7 +7,6 @@ import (
 )
 
 func TestLoadOverridesDefaultsWithEnvironmentVariables(t *testing.T) {
-	t.Setenv(EnvEnvironment, "benchmark")
 	t.Setenv(EnvMySQLHost, "mysql")
 	t.Setenv(EnvMySQLPort, "3307")
 	t.Setenv(EnvMySQLUser, "cnpj_loader")
@@ -18,14 +17,6 @@ func TestLoadOverridesDefaultsWithEnvironmentVariables(t *testing.T) {
 	result, err := Load()
 	if err != nil {
 		t.Fatalf("não esperava erro, mas recebeu: %v", err)
-	}
-
-	if result.Environment != EnvironmentBenchmark {
-		t.Errorf(
-			"ambiente deveria ser %q, mas recebeu %q",
-			EnvironmentBenchmark,
-			result.Environment,
-		)
 	}
 
 	if result.MySQL.Host != "mysql" {

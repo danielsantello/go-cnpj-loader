@@ -12,21 +12,6 @@ var schemaNamePattern = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
 func Validate(value Config) error {
 	var problems []error
 
-	switch value.Environment {
-	case EnvironmentDevelopment:
-	case EnvironmentBenchmark:
-	case EnvironmentProduction:
-	default:
-		problems = append(
-			problems,
-			fmt.Errorf(
-				"%s possui ambiente inválido: %q",
-				EnvEnvironment,
-				value.Environment,
-			),
-		)
-	}
-
 	if strings.TrimSpace(value.MySQL.Host) == "" {
 		problems = append(
 			problems,

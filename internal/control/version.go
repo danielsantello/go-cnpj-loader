@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
-
-	"github.com/danielsantello/go-cnpj-loader/internal/config"
 )
 
 type Version struct {
@@ -21,7 +19,6 @@ func CreatePendingVersion(
 	connection *sql.DB,
 	controlSchema string,
 	publicationID uint64,
-	environment config.Environment,
 ) (Version, error) {
 	if connection == nil {
 		return Version{}, fmt.Errorf(
@@ -83,7 +80,6 @@ func CreatePendingVersion(
 			SELECT COALESCE(MAX(sequence_number), 0) + 1
 			FROM %s.versions
 			WHERE publication_id = ?
-				AND environment = ?
 		`,
 		controlSchema,
 	)
@@ -94,7 +90,6 @@ func CreatePendingVersion(
 		ctx,
 		sequenceQuery,
 		publicationID,
-		environment,
 	).Scan(&sequenceNumber); err != nil {
 		return Version{}, fmt.Errorf(
 			"não foi possível definir a sequência da versão: %w",
@@ -116,13 +111,12 @@ func CreatePendingVersion(
 			INSERT INTO %s.versions (
 				publication_id,
 				schema_name,
-				environment,
 				sequence_number,
 				status,
 				created_at_utc,
 				status_changed_at_utc
 			)
-			VALUES (?, ?, ?, ?, 'pending', ?, ?)
+			VALUES (?, ?, ?, 'pending', ?, ?)
 		`,
 		controlSchema,
 	)
@@ -132,7 +126,6 @@ func CreatePendingVersion(
 		insertStatement,
 		publicationID,
 		schemaName,
-		environment,
 		sequenceNumber,
 		createdAt,
 		createdAt,

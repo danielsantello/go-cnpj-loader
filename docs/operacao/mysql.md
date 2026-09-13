@@ -251,8 +251,6 @@ Além disso, múltiplos grants com padrões sobrepostos podem produzir resultado
 - prefira uma instância dedicada quando isso for viável;
 - reavalie essa estratégia em versões futuras do MySQL.
 
-A revisão da nomenclatura dos schemas antes da primeira release também deverá considerar a estratégia de provisionamento de privilégios.
-
 ## Verificação da conta
 
 Conecte-se com a conta operacional e consulte os grants:

@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	EnvEnvironment         = "CNPJ_LOADER_ENVIRONMENT"
 	EnvMySQLHost           = "CNPJ_LOADER_MYSQL_HOST"
 	EnvMySQLPort           = "CNPJ_LOADER_MYSQL_PORT"
 	EnvMySQLUser           = "CNPJ_LOADER_MYSQL_USER"
@@ -19,10 +18,6 @@ const (
 
 func Load() (Config, error) {
 	result := Default()
-
-	if value, exists := os.LookupEnv(EnvEnvironment); exists {
-		result.Environment = Environment(value)
-	}
 
 	if value, exists := os.LookupEnv(EnvMySQLHost); exists {
 		result.MySQL.Host = value

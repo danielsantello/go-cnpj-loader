@@ -125,7 +125,6 @@ cp .env.example .env
 Configuração disponível:
 
 ```dotenv
-CNPJ_LOADER_ENVIRONMENT=development
 CNPJ_LOADER_MYSQL_HOST=127.0.0.1
 CNPJ_LOADER_MYSQL_PORT=3306
 CNPJ_LOADER_MYSQL_USER=
@@ -133,12 +132,6 @@ CNPJ_LOADER_MYSQL_PASSWORD=
 CNPJ_LOADER_MYSQL_CONNECT_TIMEOUT=5s
 CNPJ_LOADER_CONTROL_SCHEMA=cnpj_loader_control
 ```
-
-Ambientes lógicos aceitos:
-
-- `development`;
-- `benchmark`;
-- `production`.
 
 O programa não lê o arquivo `.env` automaticamente. Para carregar suas variáveis somente durante uma execução, utilize um subshell:
 
@@ -278,7 +271,6 @@ Antes da primeira release ainda serão concluídos:
 - documentação operacional;
 - configuração persistente de `local_infile`;
 - definição dos privilégios mínimos do usuário MySQL;
-- revisão da nomenclatura dos schemas;
 - testes automatizados do pacote de download;
 - validação final e geração do binário rastreável.
 

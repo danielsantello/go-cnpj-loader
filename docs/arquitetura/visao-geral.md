@@ -210,11 +210,7 @@ Exemplo:
 cnpj_2026_08_001
 ```
 
-A sequência diferencia novas cargas da mesma publicação dentro de um ambiente lógico.
-
-O cálculo atual da sequência considera a publicação e o ambiente, mas o nome físico do schema ainda não inclui o ambiente. Isso pode produzir colisões quando a mesma publicação é carregada em ambientes diferentes usando a mesma instância MySQL.
-
-A nomenclatura será revisada antes da primeira release.
+A sequência diferencia novas cargas da mesma publicação na instância MySQL configurada.
 
 ## Tabelas de dados
 
@@ -339,7 +335,6 @@ Elementos convencionais gerados pelo Cobra, como `Usage`, `Flags` e `Help`, perm
 
 Antes da primeira release:
 
-- revisar a nomenclatura dos schemas entre ambientes;
 - definir e documentar os privilégios mínimos do usuário MySQL;
 - documentar a configuração persistente de `local_infile`;
 - adicionar testes automatizados ao pacote de download.

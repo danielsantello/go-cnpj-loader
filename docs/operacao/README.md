@@ -56,7 +56,6 @@ cp .env.example .env
 Preencha as variáveis:
 
 ```dotenv
-CNPJ_LOADER_ENVIRONMENT=development
 CNPJ_LOADER_MYSQL_HOST=127.0.0.1
 CNPJ_LOADER_MYSQL_PORT=3306
 CNPJ_LOADER_MYSQL_USER=
@@ -66,12 +65,6 @@ CNPJ_LOADER_CONTROL_SCHEMA=cnpj_loader_control
 ```
 
 `CNPJ_LOADER_MYSQL_USER` e `CNPJ_LOADER_MYSQL_PASSWORD` não possuem valores padrão.
-
-Os ambientes lógicos aceitos são:
-
-- `development`;
-- `benchmark`;
-- `production`.
 
 O programa não lê `.env` automaticamente. Carregue o arquivo no ambiente do processo:
 

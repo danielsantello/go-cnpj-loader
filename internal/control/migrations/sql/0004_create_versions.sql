@@ -2,7 +2,6 @@ CREATE TABLE versions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     publication_id BIGINT UNSIGNED NOT NULL,
     schema_name VARCHAR(64) NOT NULL,
-    environment VARCHAR(16) NOT NULL,
     sequence_number INT UNSIGNED NOT NULL,
     status VARCHAR(16) NOT NULL,
     created_at_utc DATETIME(6) NOT NULL,
@@ -23,10 +22,9 @@ CREATE TABLE versions (
     CONSTRAINT uq_versions_schema_name
         UNIQUE (schema_name),
 
-    CONSTRAINT uq_versions_publication_environment_sequence
+    CONSTRAINT uq_versions_publication_sequence
         UNIQUE (
             publication_id,
-            environment,
             sequence_number
         ),
 
@@ -44,15 +42,6 @@ CREATE TABLE versions (
     CONSTRAINT chk_versions_sequence_number
         CHECK (
             sequence_number > 0
-        ),
-
-    CONSTRAINT chk_versions_environment
-        CHECK (
-            environment IN (
-                'development',
-                'benchmark',
-                'production'
-            )
         ),
 
     CONSTRAINT chk_versions_status

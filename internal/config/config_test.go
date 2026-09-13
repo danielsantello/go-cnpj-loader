@@ -8,14 +8,6 @@ import (
 func TestDefault(t *testing.T) {
 	result := Default()
 
-	if result.Environment != EnvironmentDevelopment {
-		t.Errorf(
-			"ambiente padrão deveria ser %q, mas recebeu %q",
-			EnvironmentDevelopment,
-			result.Environment,
-		)
-	}
-
 	if result.MySQL.Host != "127.0.0.1" {
 		t.Errorf(
 			"host padrão deveria ser %q, mas recebeu %q",

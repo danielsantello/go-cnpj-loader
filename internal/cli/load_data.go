@@ -64,7 +64,6 @@ func createVersionAndLoadData(
 		connection,
 		value.ControlSchema,
 		publicationID,
-		value.Environment,
 	)
 	if err != nil {
 		return control.Version{}, dataLoadResult{}, fmt.Errorf(

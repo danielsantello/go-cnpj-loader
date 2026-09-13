@@ -2,14 +2,6 @@ package config
 
 import "time"
 
-type Environment string
-
-const (
-	EnvironmentDevelopment Environment = "development"
-	EnvironmentBenchmark   Environment = "benchmark"
-	EnvironmentProduction  Environment = "production"
-)
-
 const (
 	DefaultMySQLHost      = "127.0.0.1"
 	DefaultMySQLPort      = 3306
@@ -18,7 +10,6 @@ const (
 )
 
 type Config struct {
-	Environment   Environment
 	MySQL         MySQL
 	ControlSchema string
 }
@@ -33,7 +24,6 @@ type MySQL struct {
 
 func Default() Config {
 	return Config{
-		Environment: EnvironmentDevelopment,
 		MySQL: MySQL{
 			Host:           DefaultMySQLHost,
 			Port:           DefaultMySQLPort,

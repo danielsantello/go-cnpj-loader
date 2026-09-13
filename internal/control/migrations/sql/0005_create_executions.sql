@@ -2,7 +2,6 @@ CREATE TABLE executions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     version_id BIGINT UNSIGNED NULL,
     operation VARCHAR(32) NOT NULL,
-    environment VARCHAR(16) NOT NULL,
     status VARCHAR(16) NOT NULL,
     loader_version VARCHAR(64) NOT NULL,
     loader_commit VARCHAR(64) NOT NULL,
@@ -42,15 +41,6 @@ CREATE TABLE executions (
                 'delete_version',
                 'clean_workspace',
                 'migrate_control'
-            )
-        ),
-
-    CONSTRAINT chk_executions_environment
-        CHECK (
-            environment IN (
-                'development',
-                'benchmark',
-                'production'
             )
         ),
 

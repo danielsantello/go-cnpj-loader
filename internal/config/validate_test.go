@@ -18,7 +18,6 @@ func TestValidateAcceptsValidConfiguration(t *testing.T) {
 
 func TestValidateReturnsAllConfigurationProblems(t *testing.T) {
 	value := Config{
-		Environment: "invalid",
 		MySQL: MySQL{
 			Host:           " ",
 			Port:           70000,
@@ -33,7 +32,6 @@ func TestValidateReturnsAllConfigurationProblems(t *testing.T) {
 	}
 
 	expectedMessages := []string{
-		EnvEnvironment,
 		EnvMySQLHost,
 		EnvMySQLPort,
 		EnvMySQLUser,
