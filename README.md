@@ -6,69 +6,28 @@ O programa baixa e carrega publicações completas, registra o histórico operac
 
 > O projeto está em fase de preparação da primeira release pública.
 
-## Funcionalidades
-
-- consulta dos arquivos de uma publicação da Receita Federal;
-- download sequencial dos arquivos ZIP;
-- reaproveitamento de arquivos existentes quando o tamanho corresponde ao arquivo remoto;
-- uso de arquivos temporários `.part` durante downloads;
-- validação da estrutura e da completude da publicação;
-- verificação de tamanho e SHA-256 dos arquivos;
-- criação de schemas de dados versionados;
-- carga dos dez datasets da publicação;
-- transmissão direta do conteúdo dos ZIPs para o MySQL, sem extração física dos CSVs;
-- importação em massa com `LOAD DATA LOCAL INFILE`;
-- transação independente para cada arquivo;
-- tratamento de warnings do MySQL como erro;
-- registro de publicações, arquivos, versões e migrations em um schema permanente de controle;
-- preservação do schema incompleto e do histórico em caso de falha;
-- identificação do binário por versão, commit, data de compilação e versão do Go.
-
-## Princípios
-
-- a Receita Federal é considerada a fonte soberana dos dados;
-- não são realizadas correções ou validações semânticas do conteúdo cadastral;
-- cada carga cria um novo schema;
-- schemas existentes nunca são sobrescritos ou truncados silenciosamente;
-- versões anteriores nunca são removidas automaticamente;
-- downloads e cargas são operações independentes;
-- os CSVs não são extraídos no disco;
-- cada arquivo constitui uma unidade transacional;
-- qualquer warning do MySQL interrompe a operação correspondente;
-- as tabelas são carregadas sem chaves e índices;
-- índices serão definidos posteriormente, com base em consultas e experimentos reais;
-- a publicação de uma versão para uma aplicação consumidora é uma decisão externa ao loader.
-
 ## Como funciona
 
-O fluxo normal possui duas operações independentes:
+O fluxo possui duas operações independentes:
 
-1. `download` consulta e baixa os arquivos ZIP de uma publicação para um diretório absoluto;
-2. `load` descobre e valida os ZIPs existentes em um diretório, cria um novo schema versionado e carrega os dados no MySQL.
+1. `download` consulta uma publicação da Receita Federal e baixa seus arquivos ZIP;
+2. `load` verifica os arquivos existentes, cria um novo schema versionado e carrega os dados no MySQL.
 
-O comando `load` nunca inicia um download implicitamente.
+O comando `load` não inicia downloads. Durante a carga, o conteúdo dos ZIPs é transmitido diretamente ao MySQL, sem extração física dos CSVs.
 
-Durante a carga, o conteúdo de cada ZIP é transmitido diretamente ao MySQL. Cada arquivo é carregado em sua própria transação e somente recebe `COMMIT` quando termina sem erros nem warnings.
+Cada arquivo é carregado em uma transação própria. Warnings do MySQL são tratados como erros, e schemas incompletos são preservados para diagnóstico.
 
-Uma carga bem-sucedida produz um schema como:
+Uma carga concluída produz um schema versionado, como:
 
 ```text
 cnpj_2026_08_001
 ```
 
-O schema permanente de controle registra a publicação, os arquivos e o ciclo de vida da versão:
+O schema permanente `cnpj_loader_control` registra as publicações, seus arquivos, as versões geradas e as migrations aplicadas.
 
-```text
-pending -> loading -> ready
-```
+A Receita Federal é considerada a fonte soberana dos dados. O loader realiza validações técnicas, mas não corrige nem valida semanticamente o conteúdo cadastral.
 
-Quando ocorre uma falha:
-
-```text
-pending -> loading -> failed
-```
-
-O schema incompleto e os arquivos são preservados para diagnóstico. Nenhuma limpeza automática é realizada.
+Para conhecer o fluxo completo e as decisões do projeto, consulte a [visão geral da arquitetura](docs/arquitetura/visao-geral.md).
 
 ## Requisitos
 
@@ -87,9 +46,9 @@ SHOW GLOBAL VARIABLES LIKE 'local_infile';
 
 O valor precisa estar como `ON`.
 
-A definição dos privilégios mínimos e a configuração persistente de `local_infile` serão concluídas antes da primeira release.
+Consulte [Preparação do MySQL](docs/operacao/mysql.md) para habilitar `local_infile`, criar o usuário operacional e, opcionalmente, iniciar uma instância MySQL com Docker Compose.
 
-## Compilação
+## Execução local
 
 Clone o repositório e entre no diretório do projeto:
 
@@ -98,7 +57,13 @@ git clone https://github.com/danielsantello/go-cnpj-loader.git
 cd go-cnpj-loader
 ```
 
-Compile o binário:
+Durante o desenvolvimento, execute diretamente pelo código-fonte:
+
+```bash
+go run ./cmd/cnpj-loader --help
+```
+
+Para uso recorrente, compile um binário local:
 
 ```bash
 go build \
@@ -111,6 +76,8 @@ Consulte os comandos disponíveis:
 ```bash
 bin/cnpj-loader --help
 ```
+
+Nos exemplos seguintes, substitua `bin/cnpj-loader` por `go run ./cmd/cnpj-loader` quando quiser executar diretamente pelo código-fonte.
 
 As instruções para gerar um binário com metadados de versão estão em [Compilação e execução local](docs/desenvolvimento/compilacao.md).
 
@@ -160,11 +127,9 @@ bin/cnpj-loader download \
   --destination /dados/cnpj/2026-08
 ```
 
-Os arquivos são processados sequencialmente. Essa escolha evita sobrecarregar o servidor remoto durante o download de publicações grandes.
+Arquivos existentes com o tamanho esperado são reaproveitados, e novos downloads utilizam arquivos temporários `.part`.
 
-Quando um arquivo final já existe e possui o tamanho esperado, ele é reaproveitado. Se o tamanho for diferente, o programa falha sem sobrescrevê-lo.
-
-Um novo download é gravado inicialmente como `<nome>.part` e somente é renomeado para o nome definitivo depois de ser concluído e conferido.
+Para conhecer as regras de validação, reaproveitamento e tratamento de falhas, consulte o [guia de operação](docs/operacao/README.md).
 
 ## Carga de uma publicação
 
@@ -183,22 +148,9 @@ Carregue a configuração e informe o diretório que contém todos os ZIPs da pu
 )
 ```
 
-Antes de acessar o banco, o comando:
+O comando verifica a estrutura, a completude, o tamanho e o SHA-256 dos arquivos antes de acessar o banco. Em seguida, aplica as migrations de controle, cria uma nova versão e carrega cada arquivo em uma transação própria.
 
-1. valida o ano, o mês e o diretório;
-2. descobre e classifica os arquivos;
-3. verifica a completude da publicação;
-4. confere o tamanho e o SHA-256 de cada arquivo.
-
-Em seguida, ele:
-
-1. conecta-se ao MySQL;
-2. aplica as migrations pendentes do schema de controle;
-3. registra a publicação e seus arquivos;
-4. cria uma nova versão e seu schema de dados;
-5. cria as tabelas sem índices;
-6. carrega cada arquivo em uma transação própria;
-7. marca a versão como `ready` quando toda a carga termina sem warnings.
+A versão recebe o status `ready` somente quando toda a carga termina sem erros nem warnings. Consulte o [guia de operação](docs/operacao/README.md) para conhecer o fluxo completo e o tratamento de falhas.
 
 ## Schema de controle
 
@@ -257,7 +209,7 @@ A carga integral da publicação de agosto de 2026 foi validada com os 37 arquiv
 | Arquivos ZIP | 37 |
 | Tamanho compactado | 7.692.070.350 bytes |
 | Registros carregados | 220.339.195 |
-| Tempo total | 53m8.493s |
+| Tempo total | 58m13.785s |
 | Warnings do MySQL | 0 |
 
 O teste foi executado com streaming direto dos ZIPs e transações independentes por arquivo. O resultado pode variar conforme processador, armazenamento e configuração do MySQL.
@@ -268,13 +220,10 @@ O núcleo de download e carga está implementado e foi validado com uma publica�
 
 Antes da primeira release ainda serão concluídos:
 
-- documentação operacional;
-- configuração persistente de `local_infile`;
-- definição dos privilégios mínimos do usuário MySQL;
 - testes automatizados do pacote de download;
 - validação final e geração do binário rastreável.
 
-Comandos de exclusão, limpeza e consulta de versões ainda não fazem parte da interface pública.
+A exclusão de schemas antigos e a limpeza dos arquivos baixados permanecem sob responsabilidade do operador.
 
 ## Documentação
 
