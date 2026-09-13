@@ -56,14 +56,11 @@ func TestDiscoverDirectoryPublicationReturnsValidatedFiles(t *testing.T) {
 		},
 	}
 
-	source := Source{
-		Type:     SourceTypeDirectory,
-		Location: directory,
-	}
+	sourceDirectory := directory
 
 	result, err := DiscoverDirectoryPublication(
 		catalog,
-		source,
+		sourceDirectory,
 	)
 	if err != nil {
 		t.Fatalf("não esperava erro, mas recebeu: %v", err)
@@ -130,14 +127,11 @@ func TestDiscoverDirectoryPublicationWrapsDiscoveryError(t *testing.T) {
 		t.Fatalf("não foi possível carregar o catálogo: %v", err)
 	}
 
-	source := Source{
-		Type:     SourceTypeDirectory,
-		Location: filepath.Join(t.TempDir(), "inexistente"),
-	}
+	sourceDirectory := filepath.Join(t.TempDir(), "inexistente")
 
 	result, err := DiscoverDirectoryPublication(
 		catalog,
-		source,
+		sourceDirectory,
 	)
 	if err == nil {
 		t.Fatal("esperava erro, mas recebeu nil")
@@ -190,14 +184,11 @@ func TestDiscoverDirectoryPublicationWrapsClassificationError(t *testing.T) {
 		},
 	}
 
-	source := Source{
-		Type:     SourceTypeDirectory,
-		Location: directory,
-	}
+	sourceDirectory := directory
 
 	result, err := DiscoverDirectoryPublication(
 		catalog,
-		source,
+		sourceDirectory,
 	)
 	if err == nil {
 		t.Fatal("esperava erro, mas recebeu nil")
@@ -258,14 +249,11 @@ func TestDiscoverDirectoryPublicationWrapsValidationError(t *testing.T) {
 		},
 	}
 
-	source := Source{
-		Type:     SourceTypeDirectory,
-		Location: directory,
-	}
+	sourceDirectory := directory
 
 	result, err := DiscoverDirectoryPublication(
 		catalog,
-		source,
+		sourceDirectory,
 	)
 	if err == nil {
 		t.Fatal("esperava erro, mas recebeu nil")

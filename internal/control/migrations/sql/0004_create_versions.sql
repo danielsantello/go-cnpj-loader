@@ -8,16 +8,9 @@ CREATE TABLE versions (
     status_changed_at_utc DATETIME(6) NOT NULL,
     ready_at_utc DATETIME(6) NULL,
     failed_at_utc DATETIME(6) NULL,
-    deleted_at_utc DATETIME(6) NULL,
 
     CONSTRAINT pk_versions
         PRIMARY KEY (id),
-
-    CONSTRAINT uq_versions_id_publication
-        UNIQUE (
-            id,
-            publication_id
-        ),
 
     CONSTRAINT uq_versions_schema_name
         UNIQUE (schema_name),
@@ -50,9 +43,7 @@ CREATE TABLE versions (
                 'pending',
                 'loading',
                 'ready',
-                'failed',
-                'deleting',
-                'deleted'
+                'failed'
             )
         ),
 
@@ -65,53 +56,18 @@ CREATE TABLE versions (
                 )
                 AND ready_at_utc IS NULL
                 AND failed_at_utc IS NULL
-                AND deleted_at_utc IS NULL
             )
             OR
             (
                 status = 'ready'
                 AND ready_at_utc IS NOT NULL
                 AND failed_at_utc IS NULL
-                AND deleted_at_utc IS NULL
             )
             OR
             (
                 status = 'failed'
                 AND ready_at_utc IS NULL
                 AND failed_at_utc IS NOT NULL
-                AND deleted_at_utc IS NULL
-            )
-            OR
-            (
-                status = 'deleting'
-                AND deleted_at_utc IS NULL
-                AND (
-                    (
-                        ready_at_utc IS NOT NULL
-                        AND failed_at_utc IS NULL
-                    )
-                    OR
-                    (
-                        ready_at_utc IS NULL
-                        AND failed_at_utc IS NOT NULL
-                    )
-                )
-            )
-            OR
-            (
-                status = 'deleted'
-                AND deleted_at_utc IS NOT NULL
-                AND (
-                    (
-                        ready_at_utc IS NOT NULL
-                        AND failed_at_utc IS NULL
-                    )
-                    OR
-                    (
-                        ready_at_utc IS NULL
-                        AND failed_at_utc IS NOT NULL
-                    )
-                )
             )
         ),
 
@@ -126,26 +82,11 @@ CREATE TABLE versions (
                 failed_at_utc IS NULL
                 OR failed_at_utc >= created_at_utc
             )
-            AND
-            (
-                deleted_at_utc IS NULL
-                OR deleted_at_utc >= created_at_utc
-            )
-        ),
-
-    CONSTRAINT chk_versions_deleted_at
-        CHECK (
-            deleted_at_utc IS NULL
-            OR deleted_at_utc >= COALESCE(
-                ready_at_utc,
-                failed_at_utc
-            )
         ),
 
     CONSTRAINT chk_versions_status_changed_at
         CHECK (
             status_changed_at_utc >= COALESCE(
-                deleted_at_utc,
                 ready_at_utc,
                 failed_at_utc,
                 created_at_utc

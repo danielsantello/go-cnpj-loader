@@ -127,212 +127,43 @@ func TestBootstrapCreatesControlSchema(t *testing.T) {
 		)
 	}
 
-	var tableExists bool
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'control_schema_migrations'
+	expectedTables := []string{
+		"control_schema_migrations",
+		"publications",
+		"publication_files",
+		"versions",
+	}
+
+	for _, tableName := range expectedTables {
+		var tableExists bool
+
+		err := connection.QueryRowContext(
+			ctx,
+			`
+				SELECT EXISTS (
+					SELECT 1
+					FROM information_schema.TABLES
+					WHERE TABLE_SCHEMA = ?
+						AND TABLE_NAME = ?
+				)
+			`,
+			integrationTestSchema,
+			tableName,
+		).Scan(&tableExists)
+		if err != nil {
+			t.Fatalf(
+				"não foi possível verificar a tabela %q: %v",
+				tableName,
+				err,
 			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de migrations: %v",
-			err,
-		)
-	}
+		}
 
-	if !tableExists {
-		t.Fatal("tabela de migrations deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'publications'
+		if !tableExists {
+			t.Errorf(
+				"tabela %q deveria existir",
+				tableName,
 			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de publicações: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de publicações deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'publication_files'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de arquivos da publicação: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de arquivos da publicação deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'versions'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de versões: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de versões deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'executions'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de execuções: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de execuções deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'execution_configurations'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de configurações das execuções: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de configurações das execuções deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'execution_steps'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de etapas das execuções: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de etapas das execuções deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'file_loads'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de cargas dos arquivos: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de cargas dos arquivos deveria existir")
-	}
-
-	err = connection.QueryRowContext(
-		ctx,
-		`
-			SELECT EXISTS (
-				SELECT 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = ?
-					AND TABLE_NAME = 'execution_events'
-			)
-		`,
-		integrationTestSchema,
-	).Scan(&tableExists)
-	if err != nil {
-		t.Fatalf(
-			"não foi possível verificar a tabela de eventos das execuções: %v",
-			err,
-		)
-	}
-
-	if !tableExists {
-		t.Fatal("tabela de eventos das execuções deveria existir")
+		}
 	}
 
 	catalog, err := LoadCatalog()

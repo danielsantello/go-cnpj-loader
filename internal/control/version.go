@@ -49,7 +49,6 @@ func CreatePendingVersion(
 				reference_month
 			FROM %s.publications
 			WHERE id = ?
-				AND status = 'available'
 			FOR UPDATE
 		`,
 		controlSchema,
@@ -69,7 +68,7 @@ func CreatePendingVersion(
 		&referenceMonth,
 	); err != nil {
 		return Version{}, fmt.Errorf(
-			"não foi possível localizar a publicação disponível %d: %w",
+			"não foi possível localizar a publicação %d: %w",
 			publicationID,
 			err,
 		)

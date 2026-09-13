@@ -172,7 +172,7 @@ REFERENCES
 | `UPDATE` | Atualizar migrations e estados das versões |
 | `REFERENCES` | Criar as chaves estrangeiras do schema de controle |
 
-O conjunto foi validado com as nove migrations atuais e com a criação, inserção e consulta em um schema de dados isolado.
+O conjunto foi validado com as quatro migrations atuais e com a criação, inserção e consulta em um schema de dados isolado.
 
 ## Privilégios não necessários
 

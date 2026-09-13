@@ -195,20 +195,6 @@ func loadDirectoryPublication(
 		)
 	}
 
-	source, err := publication.ParseSource(sourceValue)
-	if err != nil {
-		return loadResult{}, fmt.Errorf(
-			"origem da publicação é inválida: %w",
-			err,
-		)
-	}
-
-	if source.Type != publication.SourceTypeDirectory {
-		return loadResult{}, fmt.Errorf(
-			"o comando load atualmente aceita somente diretórios",
-		)
-	}
-
 	value, err := config.Load()
 	if err != nil {
 		return loadResult{}, fmt.Errorf(
@@ -234,7 +220,7 @@ func loadDirectoryPublication(
 
 	files, err := publication.DiscoverDirectoryPublicationWithProgress(
 		catalog,
-		source,
+		sourceValue,
 		progress,
 	)
 	if err != nil {
@@ -280,10 +266,10 @@ func loadDirectoryPublication(
 		connection,
 		value.ControlSchema,
 		control.RegisterPublicationInput{
-			ReferenceYear:  referenceYear,
-			ReferenceMonth: referenceMonth,
-			Source:         source,
-			Files:          files,
+			ReferenceYear:   referenceYear,
+			ReferenceMonth:  referenceMonth,
+			SourceDirectory: sourceValue,
+			Files:           files,
 		},
 	)
 	if err != nil {

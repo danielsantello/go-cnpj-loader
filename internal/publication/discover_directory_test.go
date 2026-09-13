@@ -42,12 +42,7 @@ func TestDiscoverDirectoryReturnsZIPFiles(t *testing.T) {
 		)
 	}
 
-	result, err := DiscoverDirectory(
-		Source{
-			Type:     SourceTypeDirectory,
-			Location: directory,
-		},
-	)
+	result, err := DiscoverDirectory(directory)
 	if err != nil {
 		t.Fatalf("não esperava erro, mas recebeu: %v", err)
 	}
@@ -83,59 +78,40 @@ func TestDiscoverDirectoryReturnsZIPFiles(t *testing.T) {
 	}
 }
 
-func TestDiscoverDirectoryRejectsInvalidSources(t *testing.T) {
+func TestDiscoverDirectoryRejectsInvalidDirectories(t *testing.T) {
 	emptyDirectory := t.TempDir()
 	missingDirectory := filepath.Join(t.TempDir(), "missing")
 
 	tests := []struct {
 		name            string
-		source          Source
+		sourceDirectory string
 		expectedMessage string
 	}{
 		{
-			name: "tipo URL",
-			source: Source{
-				Type:     SourceTypeURL,
-				Location: "https://example.com/cnpj",
-			},
-			expectedMessage: "origem deveria ser do tipo",
-		},
-		{
-			name: "localização vazia",
-			source: Source{
-				Type: SourceTypeDirectory,
-			},
+			name:            "localização vazia",
+			sourceDirectory: "",
 			expectedMessage: "localização do diretório da publicação é obrigatória",
 		},
 		{
-			name: "caminho relativo",
-			source: Source{
-				Type:     SourceTypeDirectory,
-				Location: "dados/receita",
-			},
+			name:            "caminho relativo",
+			sourceDirectory: "dados/receita",
 			expectedMessage: "deve ser absoluta",
 		},
 		{
-			name: "diretório inexistente",
-			source: Source{
-				Type:     SourceTypeDirectory,
-				Location: missingDirectory,
-			},
+			name:            "diretório inexistente",
+			sourceDirectory: missingDirectory,
 			expectedMessage: "não foi possível ler o diretório",
 		},
 		{
-			name: "diretório sem arquivos ZIP",
-			source: Source{
-				Type:     SourceTypeDirectory,
-				Location: emptyDirectory,
-			},
+			name:            "diretório sem arquivos ZIP",
+			sourceDirectory: emptyDirectory,
 			expectedMessage: "não possui arquivos ZIP",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := DiscoverDirectory(test.source)
+			result, err := DiscoverDirectory(test.sourceDirectory)
 			if err == nil {
 				t.Fatal("esperava erro, mas recebeu nil")
 			}

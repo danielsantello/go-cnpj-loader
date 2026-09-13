@@ -4,21 +4,21 @@ import "fmt"
 
 func DiscoverDirectoryPublication(
 	catalog Catalog,
-	source Source,
+	sourceDirectory string,
 ) ([]VerifiedFile, error) {
 	return DiscoverDirectoryPublicationWithProgress(
 		catalog,
-		source,
+		sourceDirectory,
 		nil,
 	)
 }
 
 func DiscoverDirectoryPublicationWithProgress(
 	catalog Catalog,
-	source Source,
+	sourceDirectory string,
 	progress VerifyFileProgress,
 ) ([]VerifiedFile, error) {
-	discoveredFiles, err := DiscoverDirectory(source)
+	discoveredFiles, err := DiscoverDirectory(sourceDirectory)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"não foi possível descobrir a publicação no diretório: %w",

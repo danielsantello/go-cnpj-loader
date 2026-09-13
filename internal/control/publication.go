@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"path/filepath"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/danielsantello/go-cnpj-loader/internal/publication"
@@ -15,10 +17,10 @@ var controlSchemaNamePattern = regexp.MustCompile(
 )
 
 type RegisterPublicationInput struct {
-	ReferenceYear  uint16
-	ReferenceMonth uint8
-	Source         publication.Source
-	Files          []publication.VerifiedFile
+	ReferenceYear   uint16
+	ReferenceMonth  uint8
+	SourceDirectory string
+	Files           []publication.VerifiedFile
 }
 
 func RegisterAvailablePublication(
@@ -54,10 +56,15 @@ func RegisterAvailablePublication(
 		)
 	}
 
-	if input.Source.Type != publication.SourceTypeDirectory {
+	if strings.TrimSpace(input.SourceDirectory) == "" {
 		return 0, fmt.Errorf(
-			"origem da publicação deveria ser do tipo %q",
-			publication.SourceTypeDirectory,
+			"diretório da publicação é obrigatório",
+		)
+	}
+
+	if !filepath.IsAbs(input.SourceDirectory) {
+		return 0, fmt.Errorf(
+			"diretório da publicação deve ser absoluto",
 		)
 	}
 
@@ -87,15 +94,13 @@ func RegisterAvailablePublication(
 			INSERT INTO %s.publications (
 				reference_year,
 				reference_month,
-				source_type,
 				source_location,
 				content_fingerprint,
-				status,
-				discovered_at_utc,
-				verified_at_utc,
-				status_changed_at_utc
+				registered_at_utc
 			)
-			VALUES (?, ?, ?, ?, ?, 'available', ?, ?, ?)
+			VALUES (?, ?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE
+					id = LAST_INSERT_ID(id)
 		`,
 		schemaName,
 	)
@@ -105,11 +110,8 @@ func RegisterAvailablePublication(
 		publicationStatement,
 		input.ReferenceYear,
 		input.ReferenceMonth,
-		input.Source.Type,
-		input.Source.Location,
+		input.SourceDirectory,
 		contentFingerprint[:],
-		registeredAt,
-		registeredAt,
 		registeredAt,
 	)
 	if err != nil {
@@ -137,12 +139,11 @@ func RegisterAvailablePublication(
 				source_location,
 				size_bytes,
 				sha256,
-				status,
-				discovered_at_utc,
-				verified_at_utc,
-				status_changed_at_utc
+				registered_at_utc
 			)
-			VALUES (?, ?, ?, ?, ?, ?, ?, 'available', ?, ?, ?)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE
+					id = id
 		`,
 		schemaName,
 	)
@@ -160,8 +161,6 @@ func RegisterAvailablePublication(
 			classifiedFile.SourceLocation,
 			file.SizeBytes,
 			file.SHA256[:],
-			registeredAt,
-			registeredAt,
 			registeredAt,
 		); err != nil {
 			return 0, fmt.Errorf(

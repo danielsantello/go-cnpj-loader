@@ -256,12 +256,7 @@ As migrations atuais criam estruturas para:
 - histórico das migrations;
 - publicações;
 - arquivos das publicações;
-- versões;
-- execuções;
-- configurações das execuções;
-- etapas das execuções;
-- cargas de arquivos;
-- eventos das execuções.
+- versões.
 
 Ao contrário das tabelas de dados durante a carga, o schema de controle possui as restrições e os índices necessários à sua própria consistência.
 

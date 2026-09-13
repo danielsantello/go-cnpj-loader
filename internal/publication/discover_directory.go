@@ -8,32 +8,24 @@ import (
 	"strings"
 )
 
-func DiscoverDirectory(source Source) ([]DiscoveredFile, error) {
-	if source.Type != SourceTypeDirectory {
-		return nil, fmt.Errorf(
-			"origem deveria ser do tipo %q, mas recebeu %q",
-			SourceTypeDirectory,
-			source.Type,
-		)
-	}
-
-	if strings.TrimSpace(source.Location) == "" {
+func DiscoverDirectory(sourceDirectory string) ([]DiscoveredFile, error) {
+	if strings.TrimSpace(sourceDirectory) == "" {
 		return nil, errors.New(
 			"localização do diretório da publicação é obrigatória",
 		)
 	}
 
-	if !filepath.IsAbs(source.Location) {
+	if !filepath.IsAbs(sourceDirectory) {
 		return nil, errors.New(
 			"localização do diretório da publicação deve ser absoluta",
 		)
 	}
 
-	entries, err := os.ReadDir(source.Location)
+	entries, err := os.ReadDir(sourceDirectory)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"não foi possível ler o diretório da publicação %q: %w",
-			source.Location,
+			sourceDirectory,
 			err,
 		)
 	}
@@ -66,7 +58,7 @@ func DiscoverDirectory(source Source) ([]DiscoveredFile, error) {
 			DiscoveredFile{
 				SourceName: entry.Name(),
 				SourceLocation: filepath.Join(
-					source.Location,
+					sourceDirectory,
 					entry.Name(),
 				),
 			},
@@ -76,7 +68,7 @@ func DiscoverDirectory(source Source) ([]DiscoveredFile, error) {
 	if len(result) == 0 {
 		return nil, fmt.Errorf(
 			"diretório da publicação %q não possui arquivos ZIP",
-			source.Location,
+			sourceDirectory,
 		)
 	}
 
