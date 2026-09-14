@@ -4,8 +4,6 @@ Carregador versionado dos dados públicos de CNPJ disponibilizados pela Receita 
 
 O programa baixa e carrega publicações completas, registra o histórico operacional e cria um novo schema de dados para cada versão. Ele é independente de qualquer API ou aplicação consumidora.
 
-> O projeto está em fase de preparação da primeira release pública.
-
 ## Como funciona
 
 O fluxo possui duas operações independentes:
@@ -217,8 +215,6 @@ O teste foi executado com streaming direto dos ZIPs e transações independentes
 ## Estado atual
 
 O núcleo de download e carga está implementado e foi validado com uma publicação completa.
-
-Para a primeira release, resta a validação final e a geração do binário rastreável.
 
 A exclusão de schemas antigos e a limpeza dos arquivos baixados permanecem sob responsabilidade do operador.
 
