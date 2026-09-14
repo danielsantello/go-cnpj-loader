@@ -326,19 +326,11 @@ O projeto utiliza:
 
 Elementos convencionais gerados pelo Cobra, como `Usage`, `Flags` e `Help`, permanecem em inglês.
 
-## Pendências arquiteturais
+## Possíveis evoluções
 
-Antes da primeira release:
-
-- definir e documentar os privilégios mínimos do usuário MySQL;
-- documentar a configuração persistente de `local_infile`;
-- adicionar testes automatizados ao pacote de download.
-
-Melhorias posteriores incluem:
+Evoluções futuras poderão incluir:
 
 - bloqueio consultivo para operações mutáveis;
-- comandos de consulta e exclusão de versões;
-- limpeza explícita de arquivos;
 - índices configuráveis;
 - retomada de downloads com HTTP Range;
 - progresso de download por bytes;

@@ -218,10 +218,7 @@ O teste foi executado com streaming direto dos ZIPs e transações independentes
 
 O núcleo de download e carga está implementado e foi validado com uma publicação completa.
 
-Antes da primeira release ainda serão concluídos:
-
-- testes automatizados do pacote de download;
-- validação final e geração do binário rastreável.
+Para a primeira release, resta a validação final e a geração do binário rastreável.
 
 A exclusão de schemas antigos e a limpeza dos arquivos baixados permanecem sob responsabilidade do operador.
 

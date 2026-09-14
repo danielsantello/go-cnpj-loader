@@ -18,6 +18,32 @@ go test -race ./...
 
 Os testes unitários não exigem uma instância do MySQL.
 
+### Testes do pacote de download
+
+Os testes de `internal/download` utilizam respostas HTTP em memória e diretórios temporários. Eles não acessam o servidor da Receita Federal nem gravam arquivos fora das áreas temporárias criadas pelo Go.
+
+A suíte verifica:
+
+- o contrato da consulta WebDAV;
+- a interpretação e a ordenação dos arquivos ZIP;
+- a rejeição de entradas e respostas HTTP inválidas;
+- o download e a publicação do arquivo final;
+- o reaproveitamento de arquivos existentes;
+- a remoção de downloads incompletos;
+- o progresso e o resumo de uma publicação.
+
+Execute somente esses testes com:
+
+```bash
+go test -count=1 -v ./internal/download
+```
+
+Consulte a cobertura do pacote com:
+
+```bash
+go test -count=1 -cover ./internal/download
+```
+
 Os testes de integração são ignorados por padrão. Isso permite executar a suíte comum e a integração contínua sem depender de uma instância externa.
 
 ## Configuração dos testes de integração
